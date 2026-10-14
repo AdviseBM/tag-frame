@@ -44,7 +44,7 @@ jobs:
       - name: Assemble the site
         run: |
           mkdir -p _site/tag-frame
-          cp tag-frame/index.html tag-frame/tag-frame.js _site/tag-frame/
+          cp public/index.html public/tag-frame.js _site/tag-frame/
           touch _site/.nojekyll
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3

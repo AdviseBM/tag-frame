@@ -11,11 +11,11 @@ import { describe, it } from 'node:test';
 import { JSDOM } from 'jsdom';
 
 const script = readFileSync(
-  new URL('../tag-frame/tag-frame.js', import.meta.url),
+  new URL('../public/tag-frame.js', import.meta.url),
   'utf8',
 );
 const html = readFileSync(
-  new URL('../tag-frame/index.html', import.meta.url),
+  new URL('../public/index.html', import.meta.url),
   'utf8',
 );
 

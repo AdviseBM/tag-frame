@@ -18,7 +18,7 @@ is clarity's ADR-0105; the behaviour is its `auth-marketing-tags` spec.
 The app posts three messages to the frame window, with the frame origin as
 the explicit target. The frame accepts them only from its parent window and
 only when the parent's origin is in `ALLOWED_PARENT_ORIGINS`
-(`tag-frame/tag-frame.js`). Anyone may embed the page; nobody else can make
+(`public/tag-frame.js`). Anyone may embed the page; nobody else can make
 it do anything.
 
 | Message        | Fields                   | When                                       |
@@ -44,7 +44,7 @@ Rules for the container, set by the page's Content-Security-Policy:
 
 - Tags must be **templates** (GA4, Google Ads, LinkedIn Insight, a Meta
   pixel template). Custom HTML tags are inline scripts and are blocked.
-- Tags may only reach the vendors' hosts listed in `tag-frame/index.html`.
+- Tags may only reach the vendors' hosts listed in `public/index.html`.
   A blocked request shows as a policy report in the frame's console; the
   fix is one host in the meta tag.
 - GA4's configuration tag should send no automatic page view and read
@@ -53,13 +53,13 @@ Rules for the container, set by the page's Content-Security-Policy:
 
 ## Publishing
 
-Every push to `master` runs the tests and publishes `tag-frame/` to GitHub
-Pages (`.github/workflows/deploy.yml`). The custom domain is not optional:
+Every push to `master` runs the tests and publishes `public/` as
+`/tag-frame/` of the site on GitHub Pages (`.github/workflows/deploy.yml`). The custom domain is not optional:
 the Pages default under `github.io` is another site, and the vendors'
 cookies would be third-party there.
 
 Setup, once: repository settings → Pages → source "GitHub Actions", custom
-domain `gh-pages.advise.is`, "Enforce HTTPS". DNS: `CNAME tags →
+domain `gh-pages.advise.is`, "Enforce HTTPS". DNS: `CNAME gh-pages →
 advisebm.github.io`.
 
 ## Developing
