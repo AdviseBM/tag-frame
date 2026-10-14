@@ -1,0 +1,25 @@
+# Tests the frame on every push and pull request. Publishing is GitHub
+# Pages' own "deploy from a branch" (settings → Pages: master, /), so a push
+# to master is live at https://tag-frame.advise.is/ a minute later; the CNAME
+# file at the root holds the custom domain for that mode.
+name: Test
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm test
+      - run: npm run format:check

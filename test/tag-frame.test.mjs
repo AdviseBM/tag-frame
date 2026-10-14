@@ -11,13 +11,10 @@ import { describe, it } from 'node:test';
 import { JSDOM } from 'jsdom';
 
 const script = readFileSync(
-  new URL('../public/tag-frame.js', import.meta.url),
+  new URL('../tag-frame.js', import.meta.url),
   'utf8',
 );
-const html = readFileSync(
-  new URL('../public/index.html', import.meta.url),
-  'utf8',
-);
+const html = readFileSync(new URL('../index.html', import.meta.url), 'utf8');
 
 const APP = 'https://bm.advise.is';
 const page = {
@@ -46,7 +43,7 @@ const frameAt = (url) => {
   return { win, send, events, scripts };
 };
 
-const FRAME_URL = 'https://gh-pages.advise.is/tag-frame/index.html';
+const FRAME_URL = 'https://tag-frame.advise.is/';
 
 describe('tag-frame.js', () => {
   it('loads the container and feeds the data layer for a listed parent', () => {
@@ -70,8 +67,8 @@ describe('tag-frame.js', () => {
     for (const origin of [
       'https://evil.example',
       'https://advise.is',
-      'https://gh-pages.advise.is',
-      'https://gh-pages.advise.is.evil.example',
+      'https://tag-frame.advise.is',
+      'https://tag-frame.advise.is.evil.example',
       'http://127.0.0.1:3002',
       'null',
     ]) {
