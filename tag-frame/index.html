@@ -1,0 +1,26 @@
+<!doctype html>
+<!--
+  The tag frame (clarity's auth-marketing-tags spec, ADR-0105): the only
+  document in which marketing's tags load. Published by GitHub Pages under
+  tags.advise.is (.github/workflows/deploy.yml) and embedded as a hidden
+  iframe by the app's public routes. Holds no ids: the app names the
+  container.
+
+  Pages sends no response headers, so the policy lives here. A meta policy
+  cannot carry frame-ancestors; who may drive this document is decided by
+  tag-frame.js (ALLOWED_PARENT_ORIGINS). No inline script: script-src has
+  no 'unsafe-inline', which also keeps Custom HTML tags out of the container.
+-->
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'none'; script-src 'self' https://www.googletagmanager.com https://connect.facebook.net https://snap.licdn.com; connect-src https://*.google-analytics.com https://*.analytics.google.com https://www.googletagmanager.com https://*.google.com https://*.googleadservices.com https://*.doubleclick.net https://www.facebook.com https://*.linkedin.com; img-src data: https://*.google-analytics.com https://*.analytics.google.com https://www.googletagmanager.com https://*.google.com https://*.googleadservices.com https://*.doubleclick.net https://www.facebook.com https://*.linkedin.com; frame-src https://*.doubleclick.net https://*.google.com; base-uri 'none'; form-action 'none'"
+    />
+    <meta name="robots" content="noindex, nofollow" />
+    <title>Advise tags</title>
+    <script src="tag-frame.js" defer></script>
+  </head>
+  <body></body>
+</html>

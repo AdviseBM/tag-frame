@@ -1,0 +1,16 @@
+{
+  "name": "@advisebm/tag-frame",
+  "version": "1.0.0",
+  "private": true,
+  "description": "The marketing tag frame embedded by bm.advise.is",
+  "type": "module",
+  "scripts": {
+    "test": "node --test \"test/**/*.test.mjs\"",
+    "format": "prettier --write .",
+    "format:check": "prettier --check ."
+  },
+  "devDependencies": {
+    "jsdom": "^26.1.0",
+    "prettier": "^3.6.2"
+  }
+}
