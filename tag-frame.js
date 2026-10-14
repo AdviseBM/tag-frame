@@ -6,7 +6,7 @@
  * layer. Marketing configures the vendors' tags in the container; the only
  * things this document knows are the three messages from the app:
  *   { type: 'init', gtmContainerId, page }  load the container
- *   { type: 'page_view', page }              one per public route
+ *   { type: 'page_view', page }              each sign-up page view
  *   { type: 'registration', eventId }        the sign-up conversion, once
  * `page` is { location, title, referrer } of the app's page — this document
  * cannot see its parent's URL, so tags read it from the data layer.

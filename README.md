@@ -21,11 +21,11 @@ only when the parent's origin is in `ALLOWED_PARENT_ORIGINS`
 (`tag-frame.js`). Anyone may embed the page; nobody else can make
 it do anything.
 
-| Message        | Fields                   | When                                       |
-| -------------- | ------------------------ | ------------------------------------------ |
-| `init`         | `gtmContainerId`, `page` | once, when the frame has loaded            |
-| `page_view`    | `page`                   | once per public route, including the first |
-| `registration` | `eventId`                | once per successful sign-up                |
+| Message        | Fields                   | When                                |
+| -------------- | ------------------------ | ----------------------------------- |
+| `init`         | `gtmContainerId`, `page` | once, when the frame has loaded     |
+| `page_view`    | `page`                   | each time the sign-up page is shown |
+| `registration` | `eventId`                | once per successful sign-up         |
 
 `page` is `{ location, title, referrer }` of the app's page: the frame
 cannot see its parent's URL. Ad click ids (`gclid`, `gbraid`, `wbraid`,
@@ -37,7 +37,7 @@ tag reads its own.
 | Data layer event | Fields                                              | Fired                        |
 | ---------------- | --------------------------------------------------- | ---------------------------- |
 | `gtm.js`         | `gtm.start`                                         | once, as the container loads |
-| `page_view`      | `page_location`, `page_title`, `page_referrer`      | once per public route        |
+| `page_view`      | `page_location`, `page_title`, `page_referrer`      | each sign-up page view       |
 | `sign_up`        | `event_id`, `method: 'email'`, plus the page fields | once per successful sign-up  |
 
 Rules for the container, set by the page's Content-Security-Policy:
