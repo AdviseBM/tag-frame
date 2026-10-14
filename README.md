@@ -2,13 +2,13 @@
 
 The marketing tag frame of [Clarity](https://github.com/AdviseBM/clarity)
 (`bm.advise.is`): one static page, published by GitHub Pages under
-`https://tags.advise.is/tag-frame/index.html`, that the app's public pages
+`https://gh-pages.advise.is/tag-frame/index.html`, that the app's public pages
 (sign-up, sign-in, password reset) embed as a hidden, sandboxed iframe. It
 loads marketing's Google Tag Manager container and feeds its data layer.
 Nothing of it exists once a user is signed in.
 
 Why a frame on its own origin: the app's origin holds the session and the
-customers' data, so no third-party script runs there. `tags.advise.is` is
+customers' data, so no third-party script runs there. `gh-pages.advise.is` is
 a different origin (vendor scripts reach nothing of the app) on the same
 site (the vendors' cookies on `.advise.is` stay first-party). The decision
 is clarity's ADR-0105; the behaviour is its `auth-marketing-tags` spec.
@@ -49,7 +49,7 @@ Rules for the container, set by the page's Content-Security-Policy:
   fix is one host in the meta tag.
 - GA4's configuration tag should send no automatic page view and read
   `page_location` / `page_referrer` from data-layer variables, since the
-  frame document's own URL is `tags.advise.is`.
+  frame document's own URL is `gh-pages.advise.is`.
 
 ## Publishing
 
@@ -59,7 +59,7 @@ the Pages default under `github.io` is another site, and the vendors'
 cookies would be third-party there.
 
 Setup, once: repository settings → Pages → source "GitHub Actions", custom
-domain `tags.advise.is`, "Enforce HTTPS". DNS: `CNAME tags →
+domain `gh-pages.advise.is`, "Enforce HTTPS". DNS: `CNAME tags →
 advisebm.github.io`.
 
 ## Developing

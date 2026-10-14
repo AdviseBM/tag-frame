@@ -46,7 +46,7 @@ const frameAt = (url) => {
   return { win, send, events, scripts };
 };
 
-const FRAME_URL = 'https://tags.advise.is/tag-frame/index.html';
+const FRAME_URL = 'https://gh-pages.advise.is/tag-frame/index.html';
 
 describe('tag-frame.js', () => {
   it('loads the container and feeds the data layer for a listed parent', () => {
@@ -70,8 +70,8 @@ describe('tag-frame.js', () => {
     for (const origin of [
       'https://evil.example',
       'https://advise.is',
-      'https://tags.advise.is',
-      'https://tags.advise.is.evil.example',
+      'https://gh-pages.advise.is',
+      'https://gh-pages.advise.is.evil.example',
       'http://127.0.0.1:3002',
       'null',
     ]) {
