@@ -30,7 +30,7 @@
   // on the developer's own machine can claim those origins.
   var ALLOWED_PARENT_ORIGINS = [
     'https://bm.advise.is',
-    // staging app origin — add when known
+    'https://stbm.advise.is',
     'http://127.0.0.1:3001',
     'http://localhost:3001',
   ];

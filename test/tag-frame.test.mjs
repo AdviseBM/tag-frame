@@ -115,6 +115,16 @@ describe('tag-frame.js', () => {
     assert.deepEqual(f.scripts(), []);
   });
 
+  it('lets the staging app embed it', () => {
+    const f = frameAt(FRAME_URL);
+    f.send('https://stbm.advise.is', {
+      type: 'init',
+      gtmContainerId: 'GTM-ST',
+      page,
+    });
+    assert.equal(f.scripts().length, 1);
+  });
+
   it("lets the app's dev server embed it", () => {
     const f = frameAt(FRAME_URL);
     f.send('http://127.0.0.1:3001', {
