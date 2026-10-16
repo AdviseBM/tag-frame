@@ -16,6 +16,14 @@
  *   { event: 'sign_up', event_id, method: 'email',
  *     page_location, page_title, page_referrer }
  *
+ * Consent: the visitor's cookie choice is made on advise.co (CookieHub) and
+ * travels in the link to the app as `consent=analytics,marketing` (the
+ * allowed categories, comma-separated); the app copies that parameter into
+ * this document's URL like the click ids. It drives Google Consent Mode:
+ * every type is denied by default before the container loads; `analytics`
+ * grants analytics_storage, `marketing` grants ad_storage, ad_user_data and
+ * ad_personalization. No parameter means everything stays denied.
+ *
  * Messages are accepted from the embedding window only, and only when it
  * is one of ALLOWED_PARENT_ORIGINS. GitHub Pages sends no headers, so this
  * list — not a frame-ancestors policy — is what keeps a stranger's page
@@ -46,6 +54,46 @@
     window.dataLayer.push(event);
   }
 
+  // A gtag command is the `arguments` object itself on the data layer; the
+  // container reads consent commands in that shape only.
+  function gtag() {
+    window.dataLayer.push(arguments);
+  }
+
+  var DENIED_ALL = {
+    ad_storage: 'denied',
+    ad_user_data: 'denied',
+    ad_personalization: 'denied',
+    analytics_storage: 'denied',
+  };
+
+  // The allowed categories from this document's own URL (`consent=a,b`).
+  function consentFromQuery(search) {
+    var match = /[?&]consent=([^&#]*)/.exec(search || '');
+    if (!match) return null;
+    var categories = decodeURIComponent(match[1].replace(/\+/g, ' ')).split(
+      ',',
+    );
+    return {
+      analytics: categories.indexOf('analytics') >= 0,
+      marketing: categories.indexOf('marketing') >= 0,
+    };
+  }
+
+  function consentUpdate(consent) {
+    if (!consent) return null;
+    var analytics = consent.analytics === true;
+    var marketing = consent.marketing === true;
+    if (!analytics && !marketing) return null;
+    var granted = marketing ? 'granted' : 'denied';
+    return {
+      ad_storage: granted,
+      ad_user_data: granted,
+      ad_personalization: granted,
+      analytics_storage: analytics ? 'granted' : 'denied',
+    };
+  }
+
   function pageFields(page) {
     page = page || lastPage || {};
     return {
@@ -60,6 +108,9 @@
     loaded = true;
     lastPage = page || null;
     window.dataLayer = window.dataLayer || [];
+    gtag('consent', 'default', DENIED_ALL);
+    var update = consentUpdate(consentFromQuery(window.location.search));
+    if (update) gtag('consent', 'update', update);
     push({ 'gtm.start': new Date().getTime(), event: 'gtm.js' });
     var s = document.createElement('script');
     s.async = true;

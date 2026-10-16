@@ -38,9 +38,18 @@ const frameAt = (url) => {
       new win.MessageEvent('message', { data, origin, source: win }),
     );
   // Array.from: jsdom's arrays belong to another realm, which strict deepEqual rejects.
-  const events = () => Array.from(win.dataLayer ?? [], (e) => String(e.event));
+  // Consent commands are `arguments` objects with no `event`; they are read
+  // by `consent()` and left out of `events()`.
+  const events = () =>
+    Array.from(win.dataLayer ?? [])
+      .filter((e) => typeof e.event === 'string')
+      .map((e) => e.event);
+  const consent = () =>
+    Array.from(win.dataLayer ?? [])
+      .filter((e) => e[0] === 'consent')
+      .map((e) => [e[1], { ...e[2] }]);
   const scripts = () => Array.from(win.document.scripts).map((s) => s.src);
-  return { win, send, events, scripts };
+  return { win, send, events, consent, scripts };
 };
 
 const FRAME_URL = 'https://tag-frame.advise.is/';
@@ -123,6 +132,55 @@ describe('tag-frame.js', () => {
       page,
     });
     assert.equal(f.scripts().length, 1);
+  });
+
+  const DENIED = {
+    ad_storage: 'denied',
+    ad_user_data: 'denied',
+    ad_personalization: 'denied',
+    analytics_storage: 'denied',
+  };
+
+  it('denies every consent type before the container loads, and grants analytics alone from an analytics-only choice', () => {
+    const f = frameAt(`${FRAME_URL}?gclid=abc&consent=analytics`);
+    f.send(APP, { type: 'init', gtmContainerId: 'GTM-TEST', page });
+    assert.deepEqual(f.consent(), [
+      ['default', DENIED],
+      ['update', { ...DENIED, analytics_storage: 'granted' }],
+    ]);
+    // The default precedes the container: it is the first data-layer entry.
+    assert.equal(f.win.dataLayer[0][0], 'consent');
+    assert.equal(f.win.dataLayer[0][1], 'default');
+    assert.deepEqual(f.events(), ['gtm.js']);
+  });
+
+  it('grants the advertising types from a marketing choice', () => {
+    const f = frameAt(`${FRAME_URL}?consent=analytics%2Cmarketing`);
+    f.send(APP, { type: 'init', gtmContainerId: 'GTM-TEST', page });
+    assert.deepEqual(f.consent()[1], [
+      'update',
+      {
+        ad_storage: 'granted',
+        ad_user_data: 'granted',
+        ad_personalization: 'granted',
+        analytics_storage: 'granted',
+      },
+    ]);
+  });
+
+  it('leaves everything denied without the parameter, or with nothing it knows', () => {
+    for (const query of [
+      '',
+      '?gclid=abc',
+      '?consent=',
+      '?consent=granted',
+      '?consent=true',
+      '?consent=preferences',
+    ]) {
+      const f = frameAt(FRAME_URL + query);
+      f.send(APP, { type: 'init', gtmContainerId: 'GTM-TEST', page });
+      assert.deepEqual(f.consent(), [['default', DENIED]], query);
+    }
   });
 
   it("lets the app's dev server embed it", () => {

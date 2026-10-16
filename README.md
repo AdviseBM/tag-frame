@@ -32,6 +32,25 @@ cannot see its parent's URL. Ad click ids (`gclid`, `gbraid`, `wbraid`,
 `fbclid`, `li_fat_id`) arrive in the frame URL's query, where each vendor's
 tag reads its own.
 
+The visitor's cookie choice is made on advise.co (CookieHub) and travels
+in the link to the app as `consent=analytics,marketing` — the allowed
+categories, comma-separated. The app copies that parameter into the frame
+URL like the click ids. The frame has no banner; it only applies what the
+URL says, through Google Consent Mode:
+
+| Choice      | Consent types granted                              |
+| ----------- | -------------------------------------------------- |
+| (none)      | nothing — every type is denied by default          |
+| `analytics` | `analytics_storage`                                |
+| `marketing` | `ad_storage`, `ad_user_data`, `ad_personalization` |
+
+The denied default is pushed before the container script loads, the update
+right after it; both are page-level `gtag('consent', …)` commands on the
+data layer, so the container needs no consent template of its own for the
+frame. Tags that are not under Consent Mode by themselves (Meta, LinkedIn)
+must carry an additional consent check on the advertising types in the
+container.
+
 ## What the container sees
 
 | Data layer event | Fields                                              | Fired                        |
