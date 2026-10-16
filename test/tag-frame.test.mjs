@@ -142,13 +142,8 @@ describe('tag-frame.js', () => {
   };
 
   it('denies every consent type before the container loads, and grants analytics alone from an analytics-only choice', () => {
-    const f = frameAt(FRAME_URL);
-    f.send(APP, {
-      type: 'init',
-      gtmContainerId: 'GTM-TEST',
-      page,
-      consent: { analytics: true, marketing: false },
-    });
+    const f = frameAt(`${FRAME_URL}?gclid=abc&consent=analytics`);
+    f.send(APP, { type: 'init', gtmContainerId: 'GTM-TEST', page });
     assert.deepEqual(f.consent(), [
       ['default', DENIED],
       ['update', { ...DENIED, analytics_storage: 'granted' }],
@@ -160,13 +155,8 @@ describe('tag-frame.js', () => {
   });
 
   it('grants the advertising types from a marketing choice', () => {
-    const f = frameAt(FRAME_URL);
-    f.send(APP, {
-      type: 'init',
-      gtmContainerId: 'GTM-TEST',
-      page,
-      consent: { analytics: true, marketing: true },
-    });
+    const f = frameAt(`${FRAME_URL}?consent=analytics%2Cmarketing`);
+    f.send(APP, { type: 'init', gtmContainerId: 'GTM-TEST', page });
     assert.deepEqual(f.consent()[1], [
       'update',
       {
@@ -178,18 +168,18 @@ describe('tag-frame.js', () => {
     ]);
   });
 
-  it('leaves everything denied for an init without a choice, or with nothing granted', () => {
-    for (const consent of [
-      undefined,
-      null,
-      'granted',
-      {},
-      { analytics: false, marketing: false },
-      { analytics: 'true', marketing: 1 },
+  it('leaves everything denied without the parameter, or with nothing it knows', () => {
+    for (const query of [
+      '',
+      '?gclid=abc',
+      '?consent=',
+      '?consent=granted',
+      '?consent=true',
+      '?consent=preferences',
     ]) {
-      const f = frameAt(FRAME_URL);
-      f.send(APP, { type: 'init', gtmContainerId: 'GTM-TEST', page, consent });
-      assert.deepEqual(f.consent(), [['default', DENIED]]);
+      const f = frameAt(FRAME_URL + query);
+      f.send(APP, { type: 'init', gtmContainerId: 'GTM-TEST', page });
+      assert.deepEqual(f.consent(), [['default', DENIED]], query);
     }
   });
 

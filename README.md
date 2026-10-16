@@ -21,21 +21,22 @@ only when the parent's origin is in `ALLOWED_PARENT_ORIGINS`
 (`tag-frame.js`). Anyone may embed the page; nobody else can make
 it do anything.
 
-| Message        | Fields                              | When                                |
-| -------------- | ----------------------------------- | ----------------------------------- |
-| `init`         | `gtmContainerId`, `page`, `consent` | once, when the frame has loaded     |
-| `page_view`    | `page`                              | each time the sign-up page is shown |
-| `registration` | `eventId`                           | once per successful sign-up         |
+| Message        | Fields                   | When                                |
+| -------------- | ------------------------ | ----------------------------------- |
+| `init`         | `gtmContainerId`, `page` | once, when the frame has loaded     |
+| `page_view`    | `page`                   | each time the sign-up page is shown |
+| `registration` | `eventId`                | once per successful sign-up         |
 
 `page` is `{ location, title, referrer }` of the app's page: the frame
 cannot see its parent's URL. Ad click ids (`gclid`, `gbraid`, `wbraid`,
 `fbclid`, `li_fat_id`) arrive in the frame URL's query, where each vendor's
 tag reads its own.
 
-`consent` is `{ analytics, marketing }`: the visitor's cookie choice, made
-on advise.co and redeemed by the app from the consent handoff (clarity's
-`consent-handoff` change). The frame has no banner; it only applies what
-it is told, through Google Consent Mode:
+The visitor's cookie choice is made on advise.co (CookieHub) and travels
+in the link to the app as `consent=analytics,marketing` — the allowed
+categories, comma-separated. The app copies that parameter into the frame
+URL like the click ids. The frame has no banner; it only applies what the
+URL says, through Google Consent Mode:
 
 | Choice      | Consent types granted                              |
 | ----------- | -------------------------------------------------- |

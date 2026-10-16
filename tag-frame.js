@@ -5,22 +5,19 @@
  * Loads the Google Tag Manager container the app names and feeds its data
  * layer. Marketing configures the vendors' tags in the container; the only
  * things this document knows are the three messages from the app:
- *   { type: 'init', gtmContainerId, page, consent }  load the container
+ *   { type: 'init', gtmContainerId, page }  load the container
  *   { type: 'page_view', page }              each sign-up page view
  *   { type: 'registration', eventId }        the sign-up conversion, once
  * `page` is { location, title, referrer } of the app's page — this document
  * cannot see its parent's URL, so tags read it from the data layer.
- * `consent` is { analytics, marketing }: the visitor's cookie choice, as the
- * app redeemed it from the handoff made on advise.co (clarity's
- * consent-handoff change). It drives Google Consent Mode: every type is
- * denied by default before the container loads; `analytics` grants
- * analytics_storage, `marketing` grants ad_storage, ad_user_data and
- * ad_personalization. No consent in `init` means everything stays denied.
  *
- * Data layer events (what the container's triggers and variables see):
- *   { event: 'page_view', page_location, page_title, page_referrer }
- *   { event: 'sign_up', event_id, method: 'email',
- *     page_location, page_title, page_referrer }
+ * Consent: the visitor's cookie choice is made on advise.co (CookieHub) and
+ * travels in the link to the app as `consent=analytics,marketing` (the
+ * allowed categories, comma-separated); the app copies that parameter into
+ * this document's URL like the click ids. It drives Google Consent Mode:
+ * every type is denied by default before the container loads; `analytics`
+ * grants analytics_storage, `marketing` grants ad_storage, ad_user_data and
+ * ad_personalization. No parameter means everything stays denied.
  *
  * Messages are accepted from the embedding window only, and only when it
  * is one of ALLOWED_PARENT_ORIGINS. GitHub Pages sends no headers, so this
@@ -65,8 +62,21 @@
     analytics_storage: 'denied',
   };
 
+  // The allowed categories from this document's own URL (`consent=a,b`).
+  function consentFromQuery(search) {
+    var match = /[?&]consent=([^&#]*)/.exec(search || '');
+    if (!match) return null;
+    var categories = decodeURIComponent(match[1].replace(/\+/g, ' ')).split(
+      ',',
+    );
+    return {
+      analytics: categories.indexOf('analytics') >= 0,
+      marketing: categories.indexOf('marketing') >= 0,
+    };
+  }
+
   function consentUpdate(consent) {
-    if (!consent || typeof consent !== 'object') return null;
+    if (!consent) return null;
     var analytics = consent.analytics === true;
     var marketing = consent.marketing === true;
     if (!analytics && !marketing) return null;
@@ -88,13 +98,13 @@
     };
   }
 
-  function init(containerId, page, consent) {
+  function init(containerId, page) {
     if (loaded || typeof containerId !== 'string' || !containerId) return;
     loaded = true;
     lastPage = page || null;
     window.dataLayer = window.dataLayer || [];
     gtag('consent', 'default', DENIED_ALL);
-    var update = consentUpdate(consent);
+    var update = consentUpdate(consentFromQuery(window.location.search));
     if (update) gtag('consent', 'update', update);
     push({ 'gtm.start': new Date().getTime(), event: 'gtm.js' });
     var s = document.createElement('script');
@@ -127,8 +137,7 @@
     if (!allowedParent(event.origin)) return;
     var data = event.data;
     if (!data || typeof data.type !== 'string') return;
-    if (data.type === 'init')
-      init(data.gtmContainerId, data.page, data.consent);
+    if (data.type === 'init') init(data.gtmContainerId, data.page);
     else if (data.type === 'page_view') pageView(data.page);
     else if (data.type === 'registration') registration(data.eventId);
   });
