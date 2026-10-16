@@ -21,16 +21,34 @@ only when the parent's origin is in `ALLOWED_PARENT_ORIGINS`
 (`tag-frame.js`). Anyone may embed the page; nobody else can make
 it do anything.
 
-| Message        | Fields                   | When                                |
-| -------------- | ------------------------ | ----------------------------------- |
-| `init`         | `gtmContainerId`, `page` | once, when the frame has loaded     |
-| `page_view`    | `page`                   | each time the sign-up page is shown |
-| `registration` | `eventId`                | once per successful sign-up         |
+| Message        | Fields                              | When                                |
+| -------------- | ----------------------------------- | ----------------------------------- |
+| `init`         | `gtmContainerId`, `page`, `consent` | once, when the frame has loaded     |
+| `page_view`    | `page`                              | each time the sign-up page is shown |
+| `registration` | `eventId`                           | once per successful sign-up         |
 
 `page` is `{ location, title, referrer }` of the app's page: the frame
 cannot see its parent's URL. Ad click ids (`gclid`, `gbraid`, `wbraid`,
 `fbclid`, `li_fat_id`) arrive in the frame URL's query, where each vendor's
 tag reads its own.
+
+`consent` is `{ analytics, marketing }`: the visitor's cookie choice, made
+on advise.co and redeemed by the app from the consent handoff (clarity's
+`consent-handoff` change). The frame has no banner; it only applies what
+it is told, through Google Consent Mode:
+
+| Choice      | Consent types granted                              |
+| ----------- | -------------------------------------------------- |
+| (none)      | nothing — every type is denied by default          |
+| `analytics` | `analytics_storage`                                |
+| `marketing` | `ad_storage`, `ad_user_data`, `ad_personalization` |
+
+The denied default is pushed before the container script loads, the update
+right after it; both are page-level `gtag('consent', …)` commands on the
+data layer, so the container needs no consent template of its own for the
+frame. Tags that are not under Consent Mode by themselves (Meta, LinkedIn)
+must carry an additional consent check on the advertising types in the
+container.
 
 ## What the container sees
 
