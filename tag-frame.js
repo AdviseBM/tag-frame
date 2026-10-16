@@ -11,6 +11,11 @@
  * `page` is { location, title, referrer } of the app's page — this document
  * cannot see its parent's URL, so tags read it from the data layer.
  *
+ * Data layer events (what the container's triggers and variables see):
+ *   { event: 'page_view', page_location, page_title, page_referrer }
+ *   { event: 'sign_up', event_id, method: 'email',
+ *     page_location, page_title, page_referrer }
+ *
  * Consent: the visitor's cookie choice is made on advise.co (CookieHub) and
  * travels in the link to the app as `consent=analytics,marketing` (the
  * allowed categories, comma-separated); the app copies that parameter into
